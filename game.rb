@@ -19,9 +19,7 @@ class Game
     guessed_letters = []
     until gameover?
       update_display(revealed_letters, guessed_letters)
-      guess = @player.guess_letter
-      guess = @player.guess_letter until valid_input?(guess) && guessed_letters.none? { |letter| letter == guess }
-      guessed_letters << guess
+      guess = retrieve_letter(guessed_letters)
       update_revealed_letters(guess, revealed_letters)
     end
   end
@@ -35,6 +33,14 @@ class Game
     @board.render
     puts "\nGuessed letters: #{guessed_letters}"
     puts "\n#{revealed_letters.join(' ')}"
+  end
+
+  # gets a guess from player and returns the guess
+  def retrieve_letter(guessed_letters)
+    guess = @player.guess_letter
+    guess = @player.guess_letter until valid_input?(guess) && guessed_letters.none? { |letter| letter == guess }
+    guessed_letters << guess
+    guess
   end
 
   # takes in a letter and the currently revealed chars
