@@ -8,31 +8,35 @@ class Game
   def initialize(dictionary, board, player)
     @dictionary = File.readlines(dictionary).map(&:chomp)
     @dictionary.reject! { |word| word.length < 5 || word.length > 12 }
-    @secret_word = @dictionary.sample 
+    @secret_word = @dictionary.sample
+    @revealed_letters = Array.new(@secret_word.length, '_')
     @board = board
     @player = player
   end
 
   def play    
-    puts "Welcome to Hangman!"
-    revealed_letters = Array.new(@secret_word.length, '_')
+    puts "Welcome to Hangman!"    
     guessed_letters = []
     until gameover?
-      update_display(revealed_letters, guessed_letters)
+      update_display(guessed_letters)
       guess = retrieve_letter(guessed_letters)
-      update_revealed_letters(guess, revealed_letters)
+      if @secret_word.include?(guess)
+        update_revealed_letters(guess)
+      else
+        @board.hang_the_man
+      end
     end
   end
 
   def gameover?
-    false
+    @board.completed? || win?
   end
 
   # renders stick figure and displays the currently revealed letters
-  def update_display(revealed_letters, guessed_letters)
+  def update_display(guessed_letters)
     @board.render
     puts "\nGuessed letters: #{guessed_letters}"
-    puts "\n#{revealed_letters.join(' ')}"
+    puts "\n#{@revealed_letters.join(' ')}"
   end
 
   # gets a guess from player and returns the guess
@@ -45,10 +49,10 @@ class Game
 
   # takes in a letter and the currently revealed chars
   # reveals all occurences of the guessed letter that are in secret word
-  def update_revealed_letters(guess, revealed_letters)
+  def update_revealed_letters(guess)
     @secret_word.each_char.with_index do |char, idx|
       if guess == char
-        revealed_letters[idx] = char
+        @revealed_letters[idx] = char
       end
     end
   end
@@ -60,7 +64,11 @@ class Game
         return true
     end
     false
-  end  
+  end
+
+  def win?
+    @revealed_letters.join == @secret_word
+  end
 end
 
 file = 'google-10000-english-no-swears.txt'

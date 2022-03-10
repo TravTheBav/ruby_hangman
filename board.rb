@@ -21,4 +21,12 @@ class Board
       puts part
     end
   end
+
+  def hang_the_man
+    @current_row += 1
+  end
+
+  def completed?
+    @current_row == @body_parts.length
+  end
 end
