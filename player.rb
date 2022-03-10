@@ -12,6 +12,7 @@ class Player
   end
 
   def guess_letter
+    puts
     print 'Guess a letter: '
     gets.chomp
   end

@@ -5,21 +5,22 @@ require_relative 'player.rb'
 require 'pry-byebug'
 
 class Game
-  def initialize(dictionary, board)
-    @dictionary = File.readlines(dictionary).map { |word| word.chomp }
-    @dictionary = @dictionary.reject { |word| word.length < 5 || word.length > 12 }
+  def initialize(dictionary, board, player)
+    @dictionary = File.readlines(dictionary).map(&:chomp)
+    @dictionary.reject! { |word| word.length < 5 || word.length > 12 }
+    @secret_word = @dictionary.sample 
     @board = board
-    @secret_word = @dictionary.sample
+    @player = player
   end
 
-  def play
-    @revealed_chars = Array.new(@secret_word.length, '_')
+  def play    
     puts "Welcome to Hangman!"
-    @player = Player.new
+    revealed_letters = Array.new(@secret_word.length, '_')
     until gameover?
-      update_display
+      update_display(revealed_letters)
       guess = @player.guess_letter
-      update_revealed_letters(guess)
+      guess = @player.guess_letter until valid_input?(guess)
+      update_revealed_letters(guess, revealed_letters)
     end
   end
 
@@ -27,21 +28,34 @@ class Game
     false
   end
 
-  def update_display
+  # renders stick figure and displays the currently revealed letters
+  def update_display(revealed_chars)
     @board.render
-    puts "\n#{@revealed_chars.join(' ')}"
+    puts "\n#{revealed_chars.join(' ')}"
   end
 
-  def update_revealed_letters(guessed_letter)
+  # takes in a letter and the currently revealed chars
+  # reveals all occurences of the guessed letter that are in secret word
+  def update_revealed_letters(guess, revealed_letters)
     @secret_word.each_char.with_index do |char, idx|
-      if guessed_letter == char
-        @revealed_chars[idx] = char
+      if guess == char
+        revealed_letters[idx] = char
       end
     end
   end
 
-  
+  def valid_input?(input)
+    return false unless input.length == 1
+    
+    if ('a'..'z').include?(input.downcase)
+        return true
+    end
+    false
+  end  
 end
 
-g = Game.new('google-10000-english-no-swears.txt', Board.new)
-g.play
+file = 'google-10000-english-no-swears.txt'
+player = Player.new
+board = Board.new
+game = Game.new(file, board, player)
+game.play
