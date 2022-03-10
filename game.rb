@@ -2,6 +2,7 @@
 # Responsible for loading in a dictionary and determining when the game is won or lost
 require_relative 'board.rb'
 require_relative 'player.rb'
+require 'pry-byebug'
 
 class Game
   def initialize(dictionary, board)
@@ -12,18 +13,31 @@ class Game
   end
 
   def play
-    revealed_chars = Array.new(@secret_word.length, '_').join(' ')
+    @revealed_chars = Array.new(@secret_word.length, '_')
     puts "Welcome to Hangman!"
     @player = Player.new
     until gameover?
-      @board.render
-      puts "\n#{revealed_chars}"
+      update_display
       guess = @player.guess_letter
+      update_revealed_letters(guess)
     end
   end
 
   def gameover?
     false
+  end
+
+  def update_display
+    @board.render
+    puts "\n#{@revealed_chars.join(' ')}"
+  end
+
+  def update_revealed_letters(guessed_letter)
+    @secret_word.each_char.with_index do |char, idx|
+      if guessed_letter == char
+        @revealed_chars[idx] = char
+      end
+    end
   end
 
   
