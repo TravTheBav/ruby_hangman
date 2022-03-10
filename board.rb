@@ -14,7 +14,7 @@ class Board
     @current_row = 0
   end
   
-  def render_stick_figure
+  def render
     @body_parts.each_with_index do |part, idx|
       break if idx == @current_row
       
