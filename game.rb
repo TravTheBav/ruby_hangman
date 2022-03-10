@@ -16,10 +16,12 @@ class Game
   def play    
     puts "Welcome to Hangman!"
     revealed_letters = Array.new(@secret_word.length, '_')
+    guessed_letters = []
     until gameover?
-      update_display(revealed_letters)
+      update_display(revealed_letters, guessed_letters)
       guess = @player.guess_letter
-      guess = @player.guess_letter until valid_input?(guess)
+      guess = @player.guess_letter until valid_input?(guess) && guessed_letters.none? { |letter| letter == guess }
+      guessed_letters << guess
       update_revealed_letters(guess, revealed_letters)
     end
   end
@@ -29,9 +31,10 @@ class Game
   end
 
   # renders stick figure and displays the currently revealed letters
-  def update_display(revealed_chars)
+  def update_display(revealed_letters, guessed_letters)
     @board.render
-    puts "\n#{revealed_chars.join(' ')}"
+    puts "\nGuessed letters: #{guessed_letters}"
+    puts "\n#{revealed_letters.join(' ')}"
   end
 
   # takes in a letter and the currently revealed chars
