@@ -2,6 +2,8 @@
 # Responsible for getting input from the player
 
 class Player
+  attr_reader :name
+
   def initialize
     @name = new_name
   end  

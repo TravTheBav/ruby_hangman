@@ -5,17 +5,16 @@ require_relative 'player.rb'
 require 'pry-byebug'
 
 class Game
-  def initialize(dictionary, board, player)
+  def initialize(dictionary, board)
     @dictionary = File.readlines(dictionary).map(&:chomp)
     @dictionary.reject! { |word| word.length < 5 || word.length > 12 }
     @secret_word = @dictionary.sample
     @revealed_letters = Array.new(@secret_word.length, '_')
-    @board = board
-    @player = player
+    @board = board    
   end
 
-  def play    
-    puts "Welcome to Hangman!"    
+  def play
+    setup_player
     guessed_letters = []
     until gameover?
       update_display(guessed_letters)
@@ -26,6 +25,23 @@ class Game
         @board.hang_the_man
       end
     end
+    print_endgame_message
+  end
+
+  def setup_player
+    system('clear')
+    puts "Welcome to Hangman!"
+    @player = Player.new
+  end
+
+  def print_endgame_message
+    if win?
+      puts "#{@player.name} wins, the answer was:"
+    else
+      @board.render
+      puts "#{@player.name} was hanged, the answer was:"
+    end
+    puts "#{@secret_word}"
   end
 
   def gameover?
@@ -34,6 +50,7 @@ class Game
 
   # renders stick figure and displays the currently revealed letters
   def update_display(guessed_letters)
+    system('clear')
     @board.render
     puts "\nGuessed letters: #{guessed_letters}"
     puts "\n#{@revealed_letters.join(' ')}"
@@ -72,7 +89,6 @@ class Game
 end
 
 file = 'google-10000-english-no-swears.txt'
-player = Player.new
 board = Board.new
-game = Game.new(file, board, player)
+game = Game.new(file, board)
 game.play
