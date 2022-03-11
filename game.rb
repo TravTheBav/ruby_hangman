@@ -2,7 +2,7 @@
 # Responsible for loading in a dictionary and determining when the game is won or lost
 require_relative 'board'
 require_relative 'player'
-require 'pry-byebug'
+require 'yaml'
 
 class Game
   def initialize(dictionary, board)
@@ -20,7 +20,7 @@ class Game
       update_display(guessed_letters)
       player_input = fetch_player_input(guessed_letters)
       if player_input == 'save'
-        #SAVE GAME
+        save
       elsif @secret_word.include?(player_input)
         update_revealed_letters(player_input)
       else
@@ -93,6 +93,14 @@ class Game
   end
 
   def save
-    
+    yaml_str = YAML.dump ({
+      secret_word: @secret_word,
+      revealed_letters: @revealed_letters,
+      board: @board,
+      player: @player
+    })
+    save_file = File.open('save_file.yaml', 'w')
+    save_file.puts yaml_str
+    save_file.close
   end
 end
