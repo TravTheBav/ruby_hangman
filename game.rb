@@ -1,7 +1,7 @@
 # A class containing methods for running the main gameplay loop
 # Responsible for loading in a dictionary and determining when the game is won or lost
-require_relative 'board.rb'
-require_relative 'player.rb'
+require_relative 'board'
+require_relative 'player'
 require 'pry-byebug'
 
 class Game
@@ -18,7 +18,7 @@ class Game
     guessed_letters = []
     until gameover?
       update_display(guessed_letters)
-      guess = retrieve_letter(guessed_letters)
+      guess = fetch_player_input(guessed_letters)
       if @secret_word.include?(guess)
         update_revealed_letters(guess)
       else
@@ -57,7 +57,7 @@ class Game
   end
 
   # gets a guess from player and returns the guess
-  def retrieve_letter(guessed_letters)
+  def fetch_player_input(guessed_letters)
     guess = @player.guess_letter
     guess = @player.guess_letter until valid_input?(guess) && guessed_letters.none? { |letter| letter == guess }
     guessed_letters << guess
@@ -76,10 +76,9 @@ class Game
 
   def valid_input?(input)
     return false unless input.length == 1
-    
-    if ('a'..'z').include?(input.downcase)
-        return true
-    end
+
+    return true if ('a'..'z').include?(input.downcase)
+
     false
   end
 
@@ -87,8 +86,3 @@ class Game
     @revealed_letters.join == @secret_word
   end
 end
-
-file = 'google-10000-english-no-swears.txt'
-board = Board.new
-game = Game.new(file, board)
-game.play
