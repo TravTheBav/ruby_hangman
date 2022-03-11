@@ -18,9 +18,11 @@ class Game
     guessed_letters = []
     until gameover?
       update_display(guessed_letters)
-      guess = fetch_player_input(guessed_letters)
-      if @secret_word.include?(guess)
-        update_revealed_letters(guess)
+      player_input = fetch_player_input(guessed_letters)
+      if player_input == 'save'
+        #SAVE GAME
+      elsif @secret_word.include?(player_input)
+        update_revealed_letters(player_input)
       else
         @board.hang_the_man
       end
@@ -30,7 +32,7 @@ class Game
 
   def setup_player
     system('clear')
-    puts "Welcome to Hangman!"
+    puts 'Welcome to Hangman!'
     @player = Player.new
   end
 
@@ -56,12 +58,15 @@ class Game
     puts "\n#{@revealed_letters.join(' ')}"
   end
 
-  # gets a guess from player and returns the guess
+  # gets a player_input from player and returns the player_input
   def fetch_player_input(guessed_letters)
-    guess = @player.guess_letter
-    guess = @player.guess_letter until valid_input?(guess) && guessed_letters.none? { |letter| letter == guess }
-    guessed_letters << guess
-    guess
+    player_input = @player.guess_letter
+    player_input = @player.guess_letter until valid_input?(player_input) && guessed_letters.none? { |letter| letter == player_input }
+
+    return player_input.downcase if player_input.downcase == 'save'
+
+    guessed_letters << player_input
+    player_input
   end
 
   # takes in a letter and the currently revealed chars
@@ -75,6 +80,7 @@ class Game
   end
 
   def valid_input?(input)
+    return true if input.downcase == 'save'
     return false unless input.length == 1
 
     return true if ('a'..'z').include?(input.downcase)
@@ -84,5 +90,9 @@ class Game
 
   def win?
     @revealed_letters.join == @secret_word
+  end
+
+  def save
+    
   end
 end
