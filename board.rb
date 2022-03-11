@@ -13,11 +13,11 @@ class Board
     ]
     @current_row = 0
   end
-  
+
   def render
     @body_parts.each_with_index do |part, idx|
       break if idx == @current_row
-      
+
       puts part
     end
   end

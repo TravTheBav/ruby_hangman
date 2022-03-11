@@ -3,22 +3,54 @@
 require_relative 'board'
 require_relative 'player'
 require 'yaml'
+require 'pry-byebug'
 
 class Game
-  def initialize(dictionary, board)
-    @dictionary = File.readlines(dictionary).map(&:chomp)
+  attr_accessor :secret_word, :player, :revealed_letters, :guessed_letters
+
+  def self.from_yaml(file_name)
+    save_file = File.open(file_name, 'r')
+    contents = save_file.read
+    data = YAML.load contents
+    save_file.close
+    game = self.new(
+      data[:board]
+    )
+    game.player = data[:player]
+    game.secret_word = data[:secret_word]
+    game.revealed_letters = data[:revealed_letters]
+    game.guessed_letters = data[:guessed_letters]
+    game
+  end
+
+  def initialize(board)
+    @dictionary = File.readlines('google-10000-english-no-swears.txt').map(&:chomp)
     @dictionary.reject! { |word| word.length < 5 || word.length > 12 }
     @secret_word = @dictionary.sample
     @revealed_letters = Array.new(@secret_word.length, '_')
-    @board = board    
+    @board = board
+    @player = nil
+    @guessed_letters = []
+  end
+
+  def save
+    yaml_str = YAML.dump ({
+      secret_word: @secret_word,
+      revealed_letters: @revealed_letters,
+      guessed_letters: @guessed_letters,
+      board: @board,
+      player: @player
+    })
+    save_file = File.open('save_file.yaml', 'w')
+    save_file.puts yaml_str
+    save_file.close
   end
 
   def play
-    setup_player
-    guessed_letters = []
+    setup_player if @player.nil?
     until gameover?
-      update_display(guessed_letters)
-      player_input = fetch_player_input(guessed_letters)
+      update_display(@guessed_letters)
+      player_input = fetch_player_input(@guessed_letters)
       if player_input == 'save'
         save
       elsif @secret_word.include?(player_input)
@@ -90,17 +122,5 @@ class Game
 
   def win?
     @revealed_letters.join == @secret_word
-  end
-
-  def save
-    yaml_str = YAML.dump ({
-      secret_word: @secret_word,
-      revealed_letters: @revealed_letters,
-      board: @board,
-      player: @player
-    })
-    save_file = File.open('save_file.yaml', 'w')
-    save_file.puts yaml_str
-    save_file.close
   end
 end
