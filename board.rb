@@ -3,7 +3,7 @@
 
 class Board
   def initialize
-    @body_parts = [  
+    @body_parts = [
       "_________ ",
       "        | ",
       "        | ",

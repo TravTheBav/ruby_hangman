@@ -1,10 +1,9 @@
-# A class containing methods for running the main gameplay loop
-# Responsible for loading in a dictionary and determining when the game is won or lost
 require_relative 'board'
 require_relative 'player'
 require 'yaml'
-require 'pry-byebug'
 
+# A class containing methods for running the main gameplay loop
+# Responsible for loading in a dictionary and determining when the game is won or lost
 class Game
   attr_accessor :secret_word, :player, :revealed_letters, :guessed_letters
 
