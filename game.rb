@@ -13,13 +13,11 @@ class Game
     contents = save_file.read
     data = YAML.load contents
     save_file.close
-    game = self.new(
+    game = new(
       data[:board]
     )
-    game.player = data[:player]
-    game.secret_word = data[:secret_word]
-    game.revealed_letters = data[:revealed_letters]
-    game.guessed_letters = data[:guessed_letters]
+    methods = %w[player= secret_word= revealed_letters= guessed_letters=]
+    methods.each { |method_name| game.send(method_name, data[method_name[0...-1].to_sym]) }
     game
   end
 
