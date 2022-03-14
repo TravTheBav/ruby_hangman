@@ -51,6 +51,8 @@ class Game
       player_input = fetch_player_input(@guessed_letters)
       if player_input == 'save'
         save
+      elsif player_input == 'quit'
+        exit
       elsif @secret_word.include?(player_input)
         update_revealed_letters(player_input)
       else
@@ -94,6 +96,7 @@ class Game
     player_input = @player.guess_letter until valid_input?(player_input) && guessed_letters.none? { |letter| letter == player_input }
 
     return player_input.downcase if player_input.downcase == 'save'
+    return player_input.downcase if player_input.downcase == 'quit'
 
     guessed_letters << player_input
     player_input
@@ -110,7 +113,7 @@ class Game
   end
 
   def valid_input?(input)
-    return true if input.downcase == 'save'
+    return true if input.downcase == 'save' || input.downcase == 'quit'
     return false unless input.length == 1
 
     return true if ('a'..'z').include?(input.downcase)
